@@ -171,7 +171,7 @@ VaR overlays
 
 Role-based authentication
 
-Author:
+# Author:
 
 Jesse Olivarez
 Finance Professional | Credit Risk | Data Analytics
