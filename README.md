@@ -127,7 +127,7 @@ http://127.0.0.1:5000
 
 Upload your exposure CSV and define your near-breach threshold.
 
-Why This Project Matters
+# Why This Project Matters
 
 This project demonstrates:
 
