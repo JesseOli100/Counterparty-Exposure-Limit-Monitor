@@ -153,9 +153,9 @@ Hedge Fund Risk Oversight
 
 Structured Products
 
-Future Improvements
+# Future Improvements
 
-Potential production-ready enhancements:
+# Potential production-ready enhancements:
 
 PostgreSQL persistence layer
 
