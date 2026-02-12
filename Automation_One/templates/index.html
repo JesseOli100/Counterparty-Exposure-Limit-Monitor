@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h5 class="card-title mb-3">Upload exposure file</h5>
+    <p class="text-muted">
+      Upload a CSV with columns:
+      <code>Counterparty</code>, <code>Exposure</code>, <code>Limit</code>.
+    </p>
+    <form method="post" enctype="multipart/form-data" class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Exposure file (CSV)</label>
+        <input class="form-control" type="file" name="file" accept=".csv" required>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Near-breach threshold (%)</label>
+        <input class="form-control" type="number" name="threshold" value="80" min="1" max="100" step="1">
+        <div class="form-text">Default = 80%</div>
+      </div>
+      <div class="col-md-3 align-self-end">
+        <button class="btn btn-primary w-100" type="submit">Analyze</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if results %}
+<hr>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5>Summary</h5>
+  <a href="{{ url_for('download') }}" class="btn btn-outline-secondary btn-sm">
+    Download full analysis (CSV)
+  </a>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card border-danger">
+      <div class="card-body">
+        <h6 class="card-title text-danger mb-1">Breaches</h6>
+        <p class="display-6 mb-0">{{ breach_count }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-warning">
+      <div class="card-body">
+        <h6 class="card-title text-warning mb-1">Near-breaches (≥ {{ threshold }}%)</h6>
+        <p class="display-6 mb-0">{{ near_count }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-success">
+      <div class="card-body">
+        <h6 class="card-title text-success mb-1">OK</h6>
+        <p class="display-6 mb-0">{{ ok_count }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if breach_count %}
+<h5 class="text-danger">Limit breaches</h5>
+<div class="table-responsive mb-4">
+  <table class="table table-sm table-striped align-middle">
+    <thead>
+      <tr>
+        <th>Counterparty</th>
+        <th class="text-end">Exposure</th>
+        <th class="text-end">Limit</th>
+        <th class="text-end">Utilization %</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in breaches %}
+      <tr>
+        <td>{{ row.counterparty }}</td>
+        <td class="text-end">{{ "{:,.2f}".format(row.exposure) }}</td>
+        <td class="text-end">{{ "{:,.2f}".format(row.limit) }}</td>
+        <td class="text-end fw-bold text-danger">{{ "{:.1f}".format(row.utilization_pct) }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if near_count %}
+<h5 class="text-warning">Near-breaches</h5>
+<div class="table-responsive mb-4">
+  <table class="table table-sm table-striped align-middle">
+    <thead>
+      <tr>
+        <th>Counterparty</th>
+        <th class="text-end">Exposure</th>
+        <th class="text-end">Limit</th>
+        <th class="text-end">Utilization %</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in near %}
+      <tr>
+        <td>{{ row.counterparty }}</td>
+        <td class="text-end">{{ "{:,.2f}".format(row.exposure) }}</td>
+        <td class="text-end">{{ "{:,.2f}".format(row.limit) }}</td>
+        <td class="text-end fw-semibold text-warning">{{ "{:.1f}".format(row.utilization_pct) }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if ok_count %}
+<h5 class="text-success">Within limits</h5>
+<div class="table-responsive mb-2">
+  <table class="table table-sm table-striped align-middle">
+    <thead>
+      <tr>
+        <th>Counterparty</th>
+        <th class="text-end">Exposure</th>
+        <th class="text-end">Limit</th>
+        <th class="text-end">Utilization %</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in ok %}
+      <tr>
+        <td>{{ row.counterparty }}</td>
+        <td class="text-end">{{ "{:,.2f}".format(row.exposure) }}</td>
+        <td class="text-end">{{ "{:,.2f}".format(row.limit) }}</td>
+        <td class="text-end">{{ "{:.1f}".format(row.utilization_pct) }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}
